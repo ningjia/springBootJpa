@@ -1,4 +1,4 @@
-package com.example.springBootJpa.springBootJpa;
+package com.example.springBootJpa;
 
 import com.example.springBootJpa.domain.User;
 import com.example.springBootJpa.service.UserRepository;
