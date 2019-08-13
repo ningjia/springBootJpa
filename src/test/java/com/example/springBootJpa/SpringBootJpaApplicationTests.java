@@ -18,20 +18,40 @@ public class SpringBootJpaApplicationTests {
 
 	@Test
 	public void contextLoads() {
-		// 创建10条记录
-		userRepository.save(new User("AAA", "10"));
-		userRepository.save(new User("BBB", "20"));
+		testSingleTable();
+	}
 
+	/**
+	 * 测试单表的增删查改操作
+	 */
+	private void testSingleTable() {
+		/* 测试单表插入操作 */
+		//创建记录
+		User userA = userRepository.save(new User("AAA", "10"));
+		User userB = userRepository.save(new User("BBB", "20"));
 		// 测试findByName, 查询姓名为AAA的User
-		Assert.assertEquals("10", userRepository.findByName("AAA").getPassword());
-
+		Assert.assertEquals(userA, userRepository.findByName("AAA"));
 		// 测试findUser, 查询姓名为BBB的User
-		Assert.assertEquals("20", userRepository.findUser("BBB").getPassword());
+		Assert.assertEquals("User(id=2, name=BBB, password=20)", userRepository.findUser("BBB").toString());
+		//测试插入的记录数
+		long count = userRepository.count();
+		Assert.assertEquals(2, count);
 
-		// 测试删除姓名为AAA和BBB的User
+		/* 测试单表更新操作 */
+		//更新记录
+		userA.setPassword("1010");
+		userRepository.save(userA);
+		//测试更新结果
+		Assert.assertEquals("1010", userRepository.findByName("AAA").getPassword());
+
+		/* 测试单表删除操作 */
+		//删除记录
 		userRepository.delete(userRepository.findByName("AAA"));
 		userRepository.delete(userRepository.findUser("BBB"));
-
+		//测试删除后的记录数
+		count = userRepository.count();
+		Assert.assertEquals(0, count);
 	}
+
 
 }
