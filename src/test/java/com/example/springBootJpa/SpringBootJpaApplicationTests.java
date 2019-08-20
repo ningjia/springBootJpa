@@ -1,6 +1,9 @@
 package com.example.springBootJpa;
 
 import com.example.springBootJpa.domain.User;
+import com.example.springBootJpa.domain.UserCard;
+import com.example.springBootJpa.domain.UserCardPK;
+import com.example.springBootJpa.service.UserCardRepository;
 import com.example.springBootJpa.service.UserRepository;
 import org.junit.Assert;
 import org.junit.Test;
@@ -9,22 +12,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.Optional;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class SpringBootJpaApplicationTests {
 
 	@Autowired
 	private UserRepository userRepository;
+	@Autowired
+	private UserCardRepository userCardRepository;
 
-	@Test
-	public void contextLoads() {
-		testSingleTable();
-	}
+
+//	@Test
+//	public void contextLoads() {
+//	}
 
 	/**
 	 * 测试单表的增删查改操作
 	 */
-	private void testSingleTable() {
+	@Test
+	public void testSingleTable() {
 		/* 测试单表插入操作 */
 		//创建记录
 		User userA = userRepository.save(new User("AAA", "10"));
@@ -50,6 +58,33 @@ public class SpringBootJpaApplicationTests {
 		userRepository.delete(userRepository.findUser("BBB"));
 		//测试删除后的记录数
 		count = userRepository.count();
+		Assert.assertEquals(0, count);
+	}
+
+
+	/**
+	 * 联合主键表的增删查改操作
+	 */
+	@Test
+	public void testCompoundKey() {
+		//创建记录
+		UserCard userCardA = userCardRepository.save(new UserCard( new UserCardPK(10001l, "Card-1"), "A123456", "备注A"));
+		UserCard userCardB = userCardRepository.save(new UserCard( new UserCardPK(10002l, "Card-2"), "B654321", "备注B"));
+		//测试findById，查询(10001,Card-1)主键的数据
+		UserCard userCardTmp = userCardRepository.findById(new UserCardPK(10001l, "Card-1")).get();
+		Assert.assertEquals(userCardTmp.getCardNo(),"A123456");
+		//更新数据
+		userCardTmp.setRemark("a123321");
+		userCardRepository.save(userCardTmp);
+		//测试更新结果
+		UserCard userCardTmp2 = userCardRepository.findById(new UserCardPK(10001l, "Card-1")).get();
+		Assert.assertEquals(userCardTmp2.getRemark(),"a123321");
+		//删除记录
+		userCardRepository.deleteById(new UserCardPK(10001l, "Card-1"));
+		UserCard userCardTmp3 = userCardRepository.findById(new UserCardPK(10002l, "Card-2")).get();
+		userCardRepository.delete(userCardTmp3);
+		//测试删除后的记录数
+		long count = userCardRepository.count();
 		Assert.assertEquals(0, count);
 	}
 
