@@ -1,8 +1,7 @@
 package com.example.springBootJpa;
 
-import com.example.springBootJpa.domain.User;
-import com.example.springBootJpa.domain.UserCard;
-import com.example.springBootJpa.domain.UserCardPK;
+import com.example.springBootJpa.domain.*;
+import com.example.springBootJpa.service.UserAddressRepository;
 import com.example.springBootJpa.service.UserCardRepository;
 import com.example.springBootJpa.service.UserRepository;
 import org.junit.Assert;
@@ -10,9 +9,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Example;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.util.Optional;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -20,13 +18,13 @@ public class SpringBootJpaApplicationTests {
 
 	@Autowired
 	private UserRepository userRepository;
+
 	@Autowired
 	private UserCardRepository userCardRepository;
 
+	@Autowired
+	private UserAddressRepository userAddressRepository;
 
-//	@Test
-//	public void contextLoads() {
-//	}
 
 	/**
 	 * 测试单表的增删查改操作
@@ -64,9 +62,10 @@ public class SpringBootJpaApplicationTests {
 
 	/**
 	 * 联合主键表的增删查改操作
+	 * 采用@Embeddable来注解复合主键
 	 */
 	@Test
-	public void testCompoundKey() {
+	public void testCompoundKeyByEmbeddable() {
 		//创建记录
 		UserCard userCardA = userCardRepository.save(new UserCard( new UserCardPK(10001l, "Card-1"), "A123456", "备注A"));
 		UserCard userCardB = userCardRepository.save(new UserCard( new UserCardPK(10002l, "Card-2"), "B654321", "备注B"));
@@ -85,6 +84,35 @@ public class SpringBootJpaApplicationTests {
 		userCardRepository.delete(userCardTmp3);
 		//测试删除后的记录数
 		long count = userCardRepository.count();
+		Assert.assertEquals(0, count);
+	}
+
+
+	/**
+	 * 联合主键表的增删查改操作
+	 * 采用@IdClass来注解复合主键
+	 */
+	@Test
+	public void testCompoundKeyByIdClass() {
+		//创建记录
+		UserAddress userAddressA = userAddressRepository.save(new UserAddress(201l, 10001l, "测试地址-1", 12345));
+		UserAddress userAddressB = userAddressRepository.save(new UserAddress(202l, 10002l, "测试地址-2", 54321));
+		//测试findOne，查询(201l,10001l)主键的数据
+		UserAddress userAddressExample = new UserAddress(201l, 10001l, null, null);
+		Example<UserAddress> queryExample = Example.of(userAddressExample);
+		UserAddress userAddress = userAddressRepository.findOne(queryExample).get();
+		Assert.assertEquals(userAddress.getAddress(),"测试地址-1");
+		//更新数据
+		userAddress.setZip(12321);
+		userAddressRepository.save(userAddress);
+		//测试更新结果
+		UserAddress userAddress1 = userAddressRepository.findById(new UserAddressPK(201l, 10001l)).get();
+		Assert.assertEquals(userAddress1.getZip(),Integer.valueOf(12321));
+		//删除记录
+		userAddressRepository.delete(userAddress1);
+		userAddressRepository.deleteById(new UserAddressPK(202l, 10002l));
+		//测试删除后的记录数
+		long count = userAddressRepository.count();
 		Assert.assertEquals(0, count);
 	}
 
