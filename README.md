@@ -191,7 +191,7 @@ hibernate的配置属性，其主要作用是：自动创建、更新、验证�
     ```
     addressId和userId尽快已经在主键类UserAddressPK中声明过了，也仍需在这里再次声明一次。（所以更推荐使用@Embeddable来实现复合主键）
 
-- 3.1.3 测试类参见SpringBootJpaApplicationTests.testCompoundKeyByIdClass()
+- 3.2.3 测试类参见SpringBootJpaApplicationTests.testCompoundKeyByIdClass()
 
 ## 运行&测试
 暂无前台方法，右键运行SpringBootJpaApplicationTests类来进行测试
