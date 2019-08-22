@@ -77,8 +77,9 @@ hibernate的配置属性，其主要作用是：自动创建、更新、验证�
 #### 自定义查询方法
 - 指定查询字段
     ```
-    方法名要以findBy+字段名来命名，如：按照"name"字段查询，使用findByName；
+    find…By，read…By，query…By，count…By，get…By等写法，如：按照"name"字段查询，使用findByName；
     ```
+    ![支持的方法名称的关键词](https://github.com/ningjia/springBootJpa/blob/master/docs/imgs/keywords.jpg?raw=true)
 - 自定义sql
     ```
     @Query("from User u where u.name=:name")
