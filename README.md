@@ -55,6 +55,35 @@ hibernate的配置属性，其主要作用是：自动创建、更新、验证�
 - update：最常用的属性，第一次加载hibernate时根据model类会自动建立起表的结构（前提是先建立好数据库），以后加载hibernate时根据model类自动更新表结构，即使表结构改变了但表中的行仍然存在不会删除以前的行。要注意的是当部署到服务器后，表结构是不会被马上建立起来的，是要等应用第一次运行起来后才会。
 - validate：每次加载hibernate时，验证创建数据库表结构，只会和数据库中的表进行比较，不会创建新表，但是会插入新值。
 
+### 3、设置数据库引擎
+- jpa创建数据库时候，会默认采用MyISAM引擎
+- 如果需要使用InnoDB引擎，需要在配置文件中配置：
+    ```
+    #innoDB引擎
+    spring.jpa.database-platform=org.hibernate.dialect.MySQL5InnoDBDialect
+    ```
+### 4、JPA的命名映射策略（hibernate5）
+- PhysicalNamingStrategyStandardImpl
+
+    不修改命名，直接按照属性名称来映射数据库字段。
+    ```
+    spring.jpa.hibernate.naming.physical-strategy=org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    ```
+    
+- SpringPhysicalNamingStrategy
+
+     默认策略。将表名、字段中的大写字母转换为分隔符号“_”。
+    ```
+    spring.jpa.hibernate.naming.physical-strategy=org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
+    ```
+    
+- 个别字段需要手工指定映射名称的话，可以在@Column注解中指定
+    ```
+    @Column(name="xxx_yyy")
+    ```
+    
+- 针对hibernate4的命名策略，参见[hibernate不同版本的命名策略](https://www.cnblogs.com/sxdcgaq8080/p/7910474.html)
+
 ## 四、JPA基础操作
 ### 1. 自定义的接口需要继承JpaRepository，会拥有JpaRepository接口及父类接口的如下实现方法：
 #### CrudRepository：
